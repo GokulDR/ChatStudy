@@ -72,6 +72,83 @@ User authentication mechanisms are essential to ensure secure and authorized acc
 Client-server chat applications are versatile tools that facilitate real-time communication between users over a network. They incorporate various components, including server-side and client-side elements, and must consider factors such as security, scalability, and concurrency. As technology continues to advance, client-server chat applications remain integral for collaborative communication in various domains.
 
 Client-server chat applications are foundational to real-time communication over networks. They incorporate principles of socket programming, communication protocols, and security mechanisms to provide a seamless user experience. Understanding the basics of client-server chat applications is essential for developers involved in networked application development, as they form the backbone of various collaborative communication systems. As technology evolves, chat applications continue to adapt, incorporating new features and technologies to enhance user interaction and connectivity.
+## Program:
+import socket
+import threading
+import time
+
+# ---------------- SERVER ----------------
+def run_server():
+    try:
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = socket.gethostname()
+        port = 8080
+
+        server.bind((host, port))
+        server.listen(1)
+
+        print("Server running on", host)
+        conn, addr = server.accept()
+        print(addr, "connected to server")
+
+        while True:
+            msg = conn.recv(1024).decode()
+            if not msg:
+                break
+            print("\nClient:", msg)
+
+            reply = input("Server >> ")
+            conn.send(reply.encode())
+
+        conn.close()
+        server.close()
+
+    except Exception as e:
+        print("Server Error:", e)
+
+
+# ---------------- CLIENT ----------------
+def run_client():
+    try:
+        time.sleep(1)  # wait for server to start
+
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = socket.gethostname()
+        port = 8080
+
+        client.connect((host, port))
+        print("Connected to server")
+
+        while True:
+            msg = input("Client >> ")
+            client.send(msg.encode())
+
+            reply = client.recv(1024).decode()
+            if not reply:
+                break
+            print("Server:", reply)
+
+        client.close()
+
+    except Exception as e:
+        print("Client Error:", e)
+
+
+# ---------------- MAIN ----------------
+server_thread = threading.Thread(target=run_server)
+client_thread = threading.Thread(target=run_client)
+
+server_thread.start()
+client_thread.start()
+
+server_thread.join()
+client_thread.join()
+
+
+
+## Output:
+<img width="1337" height="265" alt="image" src="https://github.com/user-attachments/assets/dbdae1bf-7552-4b2c-a941-fdd3aa6f0ad2" />
+
 
 
 ## Result:
